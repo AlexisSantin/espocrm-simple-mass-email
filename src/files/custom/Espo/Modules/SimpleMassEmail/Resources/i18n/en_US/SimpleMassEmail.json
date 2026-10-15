@@ -1,0 +1,17 @@
+{
+    "labels": {
+        "Parameters": "Parameters",
+        "Test email": "Test email",
+        "Test email will be sent to": "Test email will be sent to",
+        "Send test email": "Send test email",
+        "Placeholders": "Placeholders"
+    },
+    "messages": {
+        "confirmSend": "The email will be sent to the targets of this mass email. Continue?",
+        "templateLoadError": "The email content could not be loaded.",
+        "templateSaveError": "The email content could not be saved.",
+        "noTestAddress": "Your user has no email address.",
+        "testEmailSent": "Test sending started to",
+        "testEmailError": "The test email could not be sent."
+    }
+}

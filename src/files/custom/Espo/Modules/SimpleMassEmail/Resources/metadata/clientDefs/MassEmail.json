@@ -1,0 +1,6 @@
+{
+    "recordViews": {
+        "detail": "simple-mass-email:views/mass-email/record/detail",
+        "edit": "simple-mass-email:views/mass-email/record/edit"
+    }
+}

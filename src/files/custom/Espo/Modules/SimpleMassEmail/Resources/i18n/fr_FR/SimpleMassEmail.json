@@ -1,0 +1,17 @@
+{
+    "labels": {
+        "Parameters": "Paramètres",
+        "Test email": "Email de test",
+        "Test email will be sent to": "Le test sera envoyé à",
+        "Send test email": "Envoyer un test",
+        "Placeholders": "Placeholders"
+    },
+    "messages": {
+        "confirmSend": "L'email sera envoyé aux cibles de cette campagne d'email. Continuer ?",
+        "templateLoadError": "Le contenu de l'email n'a pas pu être chargé.",
+        "templateSaveError": "Le contenu de l'email n'a pas pu être enregistré.",
+        "noTestAddress": "Votre utilisateur n'a pas d'adresse email.",
+        "testEmailSent": "Envoi du test lancé vers",
+        "testEmailError": "L'email de test n'a pas pu être envoyé."
+    }
+}
