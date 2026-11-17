@@ -4,6 +4,7 @@ Extension EspoCRM qui permet de rédiger et d'envoyer un email de masse directem
 
 ## Fonctionnalités
 
+- **Entrée dans la barre latérale** : l'installation ajoute « Nouvel email groupé » juste après « Emails » dans la liste d'onglets du système. Elle ouvre directement le formulaire de création. Le lien n'est affiché qu'aux utilisateurs qui ont accès aux emails groupés (droits du rôle sur les Campagnes).
 - **Vue unique** en deux colonnes, dans des blocs à fond blanc :
   - à gauche, un bloc avec le nom, le statut, le SMTP, l'expéditeur (adresse et nom) et la réponse (adresse et nom) sur deux colonnes ; un second bloc avec le choix du template, l'objet et le corps de l'email ;
   - à droite, un bloc « Parameters » avec la campagne, les listes cibles, les listes exclues, la date de début et les options d'envoi, puis les blocs « Test email » et « Placeholders ».
@@ -21,6 +22,8 @@ Extension EspoCRM qui permet de rédiger et d'envoyer un email de masse directem
 - L'objet et le corps sont stockés dans un EmailTemplate interne, marqué `oneOff`, lié au Mass Email par `emailTemplateId`. Il est créé à la première sauvegarde puis mis à jour.
 - Si le Mass Email est lié à un template existant non `oneOff`, ce template n'est jamais modifié : une copie `oneOff` est créée à la sauvegarde seulement si l'objet ou le corps a changé.
 - Les styles sont dans `css/simple-mass-email.css`, déclaré via `metadata/app/client.json` → `cssList`.
+- Le module est livré en bundle : `lib/init.js` est déclaré dans `metadata/app/client.json` → `scriptList`. Sans lui, EspoCRM en production cherche les vues dans `lib/transpiled/` (absent du ZIP) et `#MassEmail/create` reste sur la page précédente (corrigé en 1.1.0). En mode développeur, `scriptList` n'est pas lu : les vues viennent des sources synchronisées.
+- `scripts/AfterInstall.php` ajoute l'entrée de barre latérale à `tabList` (lien `#MassEmail/create`, `aclScope` = `MassEmail`, qui suit les droits sur les Campagnes) : après « Emails », sinon avant le séparateur « Plus », sinon à la fin. Le paramètre `simpleMassEmailTabAdded` mémorise l'ajout, pour qu'une mise à jour ne remette pas un lien que l'administrateur a déplacé ou retiré. `scripts/AfterUninstall.php` retire le lien et ce paramètre.
 
 ## Prérequis
 
@@ -29,6 +32,9 @@ Extension EspoCRM qui permet de rédiger et d'envoyer un email de masse directem
 - L'envoi effectif est assuré par le cron `ProcessMassEmail`.
 
 ## Limites
+
+- L'entrée de barre latérale n'est ajoutée qu'à la liste d'onglets du système. Les utilisateurs qui ont leur propre liste (Préférences) peuvent l'ajouter eux-mêmes : onglet de type URL vers `#MassEmail/create`.
+- Le lien suit le droit de lecture sur les Campagnes. Un utilisateur qui peut lire les campagnes sans pouvoir les modifier voit donc le lien, mais EspoCRM refuse la création.
 
 - Le message « Envoi du test lancé » confirme seulement que la demande a été acceptée par le serveur, pas que l'email est parti. Vérifier la file d'attente ou les journaux.
 - Les options absentes du Mass Email natif ne sont pas ajoutées : « une seule fois / ne pas renvoyer aux contacts déjà ciblés », catégorie, utilisateur assigné et équipes.
