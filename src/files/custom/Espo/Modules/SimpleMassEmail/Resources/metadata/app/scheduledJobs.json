@@ -1,0 +1,5 @@
+{
+    "SimpleMassEmailSendPersonal": {
+        "jobClassName": "Espo\\Modules\\SimpleMassEmail\\Jobs\\SendPersonalMassEmails"
+    }
+}

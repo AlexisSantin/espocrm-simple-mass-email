@@ -1,5 +1,11 @@
 {
     "navbarTabs": {
         "NewMassEmail": "Nouvel email groupé"
+    },
+    "scopeNames": {
+        "SimpleMassEmailSend": "Envoi personnel d'email groupé"
+    },
+    "scopeNamesPlural": {
+        "SimpleMassEmailSend": "Envois personnels d'emails groupés"
     }
 }

@@ -1,0 +1,29 @@
+{
+    "fields": {
+        "emailAccount": {
+            "type": "link"
+        },
+        "massEmail": {
+            "type": "link"
+        },
+        "sentAt": {
+            "type": "datetime",
+            "required": true
+        }
+    },
+    "links": {
+        "emailAccount": {
+            "type": "belongsTo",
+            "entity": "EmailAccount"
+        },
+        "massEmail": {
+            "type": "belongsTo",
+            "entity": "MassEmail"
+        }
+    },
+    "indexes": {
+        "emailAccountIdSentAt": {
+            "columns": ["emailAccountId", "sentAt"]
+        }
+    }
+}

@@ -1,5 +1,11 @@
 {
     "navbarTabs": {
         "NewMassEmail": "New Mass Email"
+    },
+    "scopeNames": {
+        "SimpleMassEmailSend": "Personal Mass Email Send"
+    },
+    "scopeNamesPlural": {
+        "SimpleMassEmailSend": "Personal Mass Email Sends"
     }
 }

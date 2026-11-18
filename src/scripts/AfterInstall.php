@@ -4,8 +4,12 @@ use Espo\Core\Container;
 use Espo\Core\InjectableFactory;
 use Espo\Core\Utils\Config;
 use Espo\Core\Utils\Config\ConfigWriter;
+use Espo\ORM\EntityManager;
 
 /**
+ * Schedules the job that sends the mass emails of personal accounts (once, so that the schedule
+ * chosen by the administrator is kept).
+ *
  * Adds a "New Mass Email" link to the navigation (system tab list), right after Emails.
  *
  * - The link is shown only to users who have access to mass emails (`aclScope`, which follows
@@ -19,9 +23,12 @@ class AfterInstall
     private const FLAG = 'simpleMassEmailTabAdded';
     private const URL = '#MassEmail/create';
     private const DELIMITERS = ['_delimiter_', '_delimiter-ext_'];
+    private const JOB = 'SimpleMassEmailSendPersonal';
 
     public function run(Container $container): void
     {
+        $this->scheduleJob($container->getByClass(EntityManager::class));
+
         $config = $container->getByClass(Config::class);
 
         if ($config->get(self::FLAG)) {
@@ -38,6 +45,25 @@ class AfterInstall
 
         $configWriter->set(self::FLAG, true);
         $configWriter->save();
+    }
+
+    private function scheduleJob(EntityManager $entityManager): void
+    {
+        $job = $entityManager
+            ->getRDBRepository('ScheduledJob')
+            ->where(['job' => self::JOB])
+            ->findOne();
+
+        if ($job) {
+            return;
+        }
+
+        $entityManager->createEntity('ScheduledJob', [
+            'name' => 'Simple Mass Email: personal accounts',
+            'job' => self::JOB,
+            'status' => 'Active',
+            'scheduling' => '*/10 * * * *',
+        ]);
     }
 
     private function createLink(): object

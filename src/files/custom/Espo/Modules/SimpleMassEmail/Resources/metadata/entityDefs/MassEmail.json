@@ -1,0 +1,39 @@
+{
+    "fields": {
+        "status": {
+            "options": ["__APPEND__", "Throttled"],
+            "style": {
+                "Throttled": "warning"
+            }
+        },
+        "smtpAccount": {
+            "view": "simple-mass-email:views/mass-email/fields/smtp-account"
+        },
+        "emailAccount": {
+            "type": "link",
+            "massUpdateDisabled": true,
+            "layoutAvailabilityList": []
+        },
+        "dailyLimit": {
+            "type": "int",
+            "min": 1,
+            "default": 45,
+            "tooltip": true,
+            "massUpdateDisabled": true
+        },
+        "sendingProgress": {
+            "type": "jsonObject",
+            "notStorable": true,
+            "readOnly": true,
+            "orderDisabled": true,
+            "massUpdateDisabled": true,
+            "view": "simple-mass-email:views/mass-email/fields/sending-progress"
+        }
+    },
+    "links": {
+        "emailAccount": {
+            "type": "belongsTo",
+            "entity": "EmailAccount"
+        }
+    }
+}

@@ -1,5 +1,21 @@
 {
     "labels": {
         "Send email": "Send email"
+    },
+    "fields": {
+        "emailAccount": "Personal email account",
+        "dailyLimit": "Sending limit per 24 hours",
+        "sendingProgress": "Progress"
+    },
+    "options": {
+        "status": {
+            "Throttled": "Sending in batches"
+        }
+    },
+    "tooltips": {
+        "dailyLimit": "Maximum number of emails this personal account sends over any 24-hour period, all mass emails and tests included. Keep a margin below the limit of your email provider for your usual emails."
+    },
+    "links": {
+        "emailAccount": "Personal email account"
     }
 }

@@ -1,0 +1,12 @@
+[
+    {
+        "route": "/SimpleMassEmail/personalAccounts",
+        "method": "get",
+        "actionClassName": "Espo\\Modules\\SimpleMassEmail\\Api\\GetPersonalAccounts"
+    },
+    {
+        "route": "/MassEmail/action/sendTest",
+        "method": "post",
+        "actionClassName": "Espo\\Modules\\SimpleMassEmail\\Api\\PostSendTest"
+    }
+]

@@ -1,5 +1,21 @@
 {
     "labels": {
         "Send email": "Envoyer"
+    },
+    "fields": {
+        "emailAccount": "Compte email personnel",
+        "dailyLimit": "Limite d'envoi sur 24 heures",
+        "sendingProgress": "Progression"
+    },
+    "options": {
+        "status": {
+            "Throttled": "Envoi échelonné"
+        }
+    },
+    "tooltips": {
+        "dailyLimit": "Nombre maximum d'emails envoyés par ce compte personnel sur toute période de 24 heures, tous emails groupés et tests compris. Gardez une marge sous la limite de votre fournisseur pour vos emails habituels."
+    },
+    "links": {
+        "emailAccount": "Compte email personnel"
     }
 }

@@ -9,6 +9,8 @@ import MassEmailEditView from 'crm:views/mass-email/record/edit';
 import Ajax from 'ajax';
 import Ui from 'ui';
 
+const DEFAULT_DAILY_LIMIT = 45;
+
 class SimpleMassEmailEditView extends MassEmailEditView {
 
     // language=Handlebars
@@ -35,6 +37,13 @@ class SimpleMassEmailEditView extends MassEmailEditView {
                         <div class="simple-mass-email-row">
                             <label class="control-label">{{translate 'smtpAccount' category='fields' scope='MassEmail'}}</label>
                             <div class="field" data-name="smtpAccount"></div>
+                        </div>
+                        <div class="simple-mass-email-row hidden" data-role="daily-limit">
+                            <label class="control-label">{{translate 'dailyLimit' category='fields' scope='MassEmail'}}</label>
+                            <div class="field" data-name="dailyLimit"></div>
+                            <p class="text-muted small simple-mass-email-hint">
+                                {{translate 'dailyLimitHint' category='labels' scope='SimpleMassEmail'}}
+                            </p>
                         </div>
                         <div class="simple-mass-email-pair">
                             <div class="simple-mass-email-row">
@@ -181,9 +190,23 @@ class SimpleMassEmailEditView extends MassEmailEditView {
             'fromName',
             'replyToAddress',
             'replyToName',
+            'dailyLimit',
         ];
 
-        this.fieldNameList.forEach(name => this.createField(name));
+        this.fieldNameList.forEach(name => {
+            // The sender of a personal account is the account itself.
+            const readOnly = name === 'fromAddress' && this.isPersonal();
+
+            // A number field cannot go through the parent's render: its input is not there yet.
+            // Like the others, it is rendered by afterRender.
+            this.createField(name, null, null, 'edit', readOnly, {notToRender: name === 'dailyLimit'});
+        });
+
+        this.listenTo(this.model, 'change:emailAccountId', (model, value, options) => {
+            if (options.ui) {
+                this.onPersonalAccountChange();
+            }
+        });
 
         this.createEmailTemplateField();
 
@@ -229,6 +252,50 @@ class SimpleMassEmailEditView extends MassEmailEditView {
                 view.render();
             }
         });
+
+        this.updateDailyLimitRow();
+    }
+
+    isPersonal() {
+        return !!this.model.get('emailAccountId');
+    }
+
+    updateDailyLimitRow() {
+        const isPersonal = this.isPersonal();
+
+        this.element.querySelector('[data-role="daily-limit"]')?.classList.toggle('hidden', !isPersonal);
+
+        const view = this.getView('dailyLimitField');
+
+        if (view) {
+            view.params.required = isPersonal;
+        }
+    }
+
+    async onPersonalAccountChange() {
+        const fromAddressView = this.getView('fromAddressField');
+        const id = this.model.get('emailAccountId');
+
+        this.updateDailyLimitRow();
+
+        if (!id) {
+            fromAddressView.setNotReadOnly();
+
+            await fromAddressView.setEditMode();
+            await fromAddressView.reRender();
+
+            return;
+        }
+
+        const account = this.getView('smtpAccountField').getPersonalAccount(id);
+
+        this.model.set({
+            fromAddress: account?.emailAddress,
+            fromName: account?.fromName || this.model.get('fromName'),
+            dailyLimit: this.model.get('dailyLimit') || DEFAULT_DAILY_LIMIT,
+        });
+
+        await fromAddressView.setReadOnly();
     }
 
     data() {
@@ -473,7 +540,10 @@ class SimpleMassEmailEditView extends MassEmailEditView {
     }
 
     actionSendEmail() {
-        const message = this.translate('confirmSend', 'messages', 'SimpleMassEmail');
+        const message = this.isPersonal() ?
+            this.translate('confirmSendPersonal', 'messages', 'SimpleMassEmail')
+                .replace('{limit}', this.getView('dailyLimitField').fetch().dailyLimit) :
+            this.translate('confirmSend', 'messages', 'SimpleMassEmail');
 
         Ui.confirm(message, {
             confirmText: this.translate('Send email', 'labels', 'MassEmail'),
@@ -527,6 +597,15 @@ class SimpleMassEmailEditView extends MassEmailEditView {
             Ui.success(this.translate('testEmailSent', 'messages', 'SimpleMassEmail') + ' ' + address);
         }
         catch (e) {
+            // A precise reason from the server is displayed by the application.
+            if (e?.responseText?.includes('messageTranslation')) {
+                return;
+            }
+
+            if (e) {
+                e.errorIsHandled = true;
+            }
+
             Ui.error(this.translate('testEmailError', 'messages', 'SimpleMassEmail'));
         }
     }

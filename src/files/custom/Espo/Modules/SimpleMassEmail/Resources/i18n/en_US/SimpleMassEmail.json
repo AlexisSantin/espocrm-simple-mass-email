@@ -4,7 +4,14 @@
         "Test email": "Test email",
         "Test email will be sent to": "Test email will be sent to",
         "Send test email": "Send test email",
-        "Placeholders": "Placeholders"
+        "Placeholders": "Placeholders",
+        "Personal sending": "Sending through a personal account",
+        "personal": "personal",
+        "dailyLimitHint": "The remaining emails leave automatically over the following days.",
+        "progressCounts": "{sent} sent, {pending} waiting, {failed} not sent",
+        "progressWindow": "{usedInWindow} of {limit} used over the last 24 hours",
+        "progressNext": "Next sending possible: {date}",
+        "progressDays": "About {daysLeft} day(s) left"
     },
     "messages": {
         "confirmSend": "The email will be sent to the targets of this mass email. Continue?",
@@ -12,6 +19,12 @@
         "templateSaveError": "The email content could not be saved.",
         "noTestAddress": "Your user has no email address.",
         "testEmailSent": "Test sending started to",
-        "testEmailError": "The test email could not be sent."
+        "testEmailError": "The test email could not be sent.",
+        "confirmSendPersonal": "The email will leave from your personal account, at most {limit} per 24 hours, until all targets are reached. Continue?",
+        "accountNotUsable": "This personal email account cannot send: check that it is active and that its SMTP is configured.",
+        "dailyLimitReached": "The limit of this account over 24 hours is reached.",
+        "sendingSuspendedAccount": "Sending of {link} is suspended: the personal email account can no longer be used. Fix the account, then send the mass email again to resume.",
+        "sendingSuspendedSmtp": "Sending of {link} is suspended: the SMTP server keeps refusing the emails. Check the account, then send the mass email again to resume.",
+        "sendingSuspendedInformational": "Sending of {link} is suspended: an informational campaign has no unsubscribe link and cannot use a personal email account."
     }
 }

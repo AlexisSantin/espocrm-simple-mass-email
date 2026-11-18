@@ -1,0 +1,14 @@
+{
+    "beforeCreateHookClassNameList": [
+        "__APPEND__",
+        "Espo\\Modules\\SimpleMassEmail\\Classes\\RecordHooks\\MassEmail\\CheckPersonalSending"
+    ],
+    "beforeUpdateHookClassNameList": [
+        "__APPEND__",
+        "Espo\\Modules\\SimpleMassEmail\\Classes\\RecordHooks\\MassEmail\\CheckPersonalSending"
+    ],
+    "readLoaderClassNameList": [
+        "__APPEND__",
+        "Espo\\Modules\\SimpleMassEmail\\Classes\\FieldProcessing\\MassEmail\\SendingProgressLoader"
+    ]
+}
