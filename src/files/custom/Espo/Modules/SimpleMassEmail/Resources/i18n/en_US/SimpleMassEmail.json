@@ -2,7 +2,6 @@
     "labels": {
         "Parameters": "Parameters",
         "Test email": "Test email",
-        "Test email will be sent to": "Test email will be sent to",
         "Send test email": "Send test email",
         "Placeholders": "Placeholders",
         "Personal sending": "Sending through a personal account",
@@ -12,15 +11,22 @@
         "progressWindow": "{usedInWindow} of {limit} used over the last 24 hours",
         "progressNext": "Next sending possible: {date}",
         "progressDays": "About {daysLeft} day(s) left",
-        "noTestAddressHint": "Your user has no email address. Add one to your profile to receive the test.",
-        "Open my profile": "Open my profile"
+        "Send now": "Send now",
+        "Schedule…": "Schedule…",
+        "Schedule sending": "Schedule the sending",
+        "Schedule": "Schedule",
+        "Scheduled": "Scheduled",
+        "Resume sending": "Resume sending",
+        "Cancel schedule": "Cancel schedule",
+        "Pause": "Pause",
+        "Sending": "Sending",
+        "testHint": "Choose who receives the test: users, contacts, leads or accounts.",
+        "campaignRequiredHint": "Your role requires a campaign that you can edit."
     },
     "messages": {
-        "confirmSend": "The email will be sent to the targets of this mass email. Continue?",
+        "confirmSend": "The email will be sent now to all the targets. Continue?",
         "templateLoadError": "The email content could not be loaded.",
         "templateSaveError": "The email content could not be saved.",
-        "noTestAddress": "Your user has no email address.",
-        "testEmailSent": "Test sending started to",
         "testEmailError": "The test email could not be sent.",
         "confirmSendPersonal": "The email will leave from your personal account, at most {limit} per 24 hours, until all targets are reached. Continue?",
         "accountNotUsable": "This personal email account cannot send: check that it is active and that its SMTP is configured.",
@@ -28,6 +34,12 @@
         "sendingSuspendedAccount": "Sending of {link} is suspended: the personal email account can no longer be used. Fix the account, then send the mass email again to resume.",
         "sendingSuspendedSmtp": "Sending of {link} is suspended: the SMTP server keeps refusing the emails. Check the account, then send the mass email again to resume.",
         "sendingSuspendedInformational": "Sending of {link} is suspended: an informational campaign has no unsubscribe link and cannot use a personal email account.",
-        "notAccountOwner": "Only the owner of this personal email account can send or change this mass email."
+        "notAccountOwner": "Only the owner of this personal email account can send or change this mass email.",
+        "sendStarted": "Sending starts within about a minute.",
+        "sendScheduled": "Sending scheduled for {date}.",
+        "scheduleHint": "The email will be sent automatically at this date.",
+        "scheduleInPast": "Choose a date in the future.",
+        "scheduleCancelled": "Schedule cancelled: the mass email is back to draft.",
+        "sendingPaused": "Sending paused. Send it again to resume with the remaining recipients."
     }
 }

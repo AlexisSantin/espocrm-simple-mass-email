@@ -1,0 +1,5 @@
+{
+    "primaryFilterClassNameMap": {
+        "actual": "Espo\\Modules\\SimpleMassEmail\\Classes\\Select\\MassEmail\\PrimaryFilters\\Actual"
+    }
+}

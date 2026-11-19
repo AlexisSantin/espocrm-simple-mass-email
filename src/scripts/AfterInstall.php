@@ -10,8 +10,8 @@ use Espo\ORM\EntityManager;
  * Gives the content templates created without an assigned user (before 1.2.1) to their author:
  * roles that read only their own templates could not open nor link them.
  *
- * Schedules the job that sends the mass emails of personal accounts (once, so that the schedule
- * chosen by the administrator is kept).
+ * Schedules the job that sends the mass emails, every minute (once, so that the schedule chosen
+ * by the administrator is kept).
  *
  * Adds a "New Mass Email" link to the navigation (system tab list), right after Emails.
  *
@@ -27,6 +27,8 @@ class AfterInstall
     private const URL = '#MassEmail/create';
     private const DELIMITERS = ['_delimiter_', '_delimiter-ext_'];
     private const JOB = 'SimpleMassEmailSendPersonal';
+    private const SCHEDULING = '* * * * *';
+    private const OLD_SCHEDULING = '*/10 * * * *';
 
     public function run(Container $container): void
     {
@@ -78,14 +80,21 @@ class AfterInstall
             ->findOne();
 
         if ($job) {
+            // Every 10 minutes up to 1.2: "Send now" now relies on a run every minute. A schedule
+            // the administrator changed is kept.
+            if ($job->get('scheduling') === self::OLD_SCHEDULING) {
+                $job->set('scheduling', self::SCHEDULING);
+                $entityManager->saveEntity($job);
+            }
+
             return;
         }
 
         $entityManager->createEntity('ScheduledJob', [
-            'name' => 'Simple Mass Email: personal accounts',
+            'name' => 'Simple Mass Email: sending',
             'job' => self::JOB,
             'status' => 'Active',
-            'scheduling' => '*/10 * * * *',
+            'scheduling' => self::SCHEDULING,
         ]);
     }
 

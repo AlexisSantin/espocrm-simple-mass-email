@@ -1,7 +1,4 @@
 {
-    "labels": {
-        "Send email": "Envoyer"
-    },
     "fields": {
         "emailAccount": "Compte email personnel",
         "dailyLimit": "Limite d'envoi sur 24 heures",
@@ -9,7 +6,8 @@
     },
     "options": {
         "status": {
-            "Throttled": "Envoi échelonné"
+            "Throttled": "Envoi échelonné",
+            "Sending": "Envoi en cours"
         }
     },
     "tooltips": {

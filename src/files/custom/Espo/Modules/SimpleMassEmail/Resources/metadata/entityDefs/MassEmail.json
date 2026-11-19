@@ -1,10 +1,15 @@
 {
     "fields": {
         "status": {
-            "options": ["__APPEND__", "Throttled"],
+            "options": ["__APPEND__", "Sending", "Throttled"],
             "style": {
+                "Sending": "warning",
                 "Throttled": "warning"
-            }
+            },
+            "view": "simple-mass-email:views/mass-email/fields/status"
+        },
+        "startAt": {
+            "required": false
         },
         "smtpAccount": {
             "view": "simple-mass-email:views/mass-email/fields/smtp-account"

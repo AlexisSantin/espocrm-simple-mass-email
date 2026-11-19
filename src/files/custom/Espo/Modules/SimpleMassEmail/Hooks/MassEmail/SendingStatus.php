@@ -3,6 +3,7 @@
 namespace Espo\Modules\SimpleMassEmail\Hooks\MassEmail;
 
 use Espo\Core\Exceptions\Forbidden;
+use Espo\Core\Field\DateTime;
 use Espo\Core\Hook\Hook\BeforeSave;
 use Espo\Core\ORM\Repository\Option\SaveOption;
 use Espo\Entities\EmailAccount;
@@ -13,13 +14,22 @@ use Espo\ORM\EntityManager;
 use Espo\ORM\Repository\Option\SaveOptions;
 
 /**
- * Keeps the mass emails of personal accounts out of the native sending, on every save. If the
- * extension is removed, their status leaves them untouched instead of sending them all at once.
+ * Hands every mass email that is sent, now or at a planned date, to the extension's job, which runs
+ * every minute: Sending through the system or a group account, Throttled through a personal account.
+ * The native job only knows Pending and In Process, so it never sends them at the same time, and
+ * if the extension is removed they stay untouched instead of leaving all at once.
  *
  * @implements BeforeSave<MassEmail>
  */
-class PersonalSending implements BeforeSave
+class SendingStatus implements BeforeSave
 {
+    private const SENT_STATUSES = [
+        MassEmail::STATUS_PENDING,
+        MassEmail::STATUS_IN_PROCESS,
+        Runner::STATUS_SENDING,
+        Runner::STATUS_THROTTLED,
+    ];
+
     public function __construct(private EntityManager $entityManager) {}
 
     /**
@@ -37,18 +47,19 @@ class PersonalSending implements BeforeSave
             throw new Forbidden("No mass update for a mass email of a personal account.");
         }
 
+        if (in_array($entity->getStatus(), self::SENT_STATUSES, true)) {
+            // "Send now" leaves the date empty.
+            if (!$entity->get('startAt')) {
+                $entity->set('startAt', DateTime::createNow()->toString());
+            }
+
+            $entity->setStatus($accountId ? Runner::STATUS_THROTTLED : Runner::STATUS_SENDING);
+        }
+
         if (!$accountId) {
             $entity->set('dailyLimit', null);
 
-            if ($entity->getStatus() === Runner::STATUS_THROTTLED) {
-                $entity->setStatus(MassEmail::STATUS_DRAFT);
-            }
-
             return;
-        }
-
-        if (in_array($entity->getStatus(), [MassEmail::STATUS_PENDING, MassEmail::STATUS_IN_PROCESS], true)) {
-            $entity->setStatus(Runner::STATUS_THROTTLED);
         }
 
         $entity->set('inboundEmailId', null);

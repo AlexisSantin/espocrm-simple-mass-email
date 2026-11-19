@@ -23,10 +23,14 @@ class SimpleMassEmailSendingProgressFieldView extends BaseFieldView {
             return [];
         }
 
-        const lines = [
-            this.format('progressCounts', progress),
-            this.format('progressWindow', progress),
-        ];
+        const lines = [this.format('progressCounts', progress)];
+
+        // A personal account: its limit over 24 hours.
+        if (!progress.limit) {
+            return lines;
+        }
+
+        lines.push(this.format('progressWindow', progress));
 
         if (this.model.get('status') !== 'Throttled' || !progress.pending) {
             return lines;

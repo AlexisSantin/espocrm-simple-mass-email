@@ -22,24 +22,35 @@ class SendingProgressLoader implements Loader
 
     public function process(Entity $entity, Params $params): void
     {
-        $accountId = $entity->get('emailAccountId');
-
-        if (!$accountId || ($params->hasSelect() && !$params->hasInSelect('sendingProgress'))) {
+        if ($params->hasSelect() && !$params->hasInSelect('sendingProgress')) {
             return;
         }
 
-        $limit = max(1, (int) $entity->get('dailyLimit'));
         $pending = $this->countItems($entity, EmailQueueItem::STATUS_PENDING);
+        $sent = $this->countItems($entity, EmailQueueItem::STATUS_SENT);
+        $failed = $this->countItems($entity, EmailQueueItem::STATUS_FAILED);
+        $accountId = $entity->get('emailAccountId');
 
-        $entity->set('sendingProgress', (object) [
-            'sent' => $this->countItems($entity, EmailQueueItem::STATUS_SENT),
-            'failed' => $this->countItems($entity, EmailQueueItem::STATUS_FAILED),
+        if (!$accountId && $pending + $sent + $failed === 0) {
+            return;
+        }
+
+        $progress = (object) [
+            'sent' => $sent,
+            'failed' => $failed,
             'pending' => $pending,
-            'limit' => $limit,
-            'usedInWindow' => $this->sendLog->countInWindow($accountId),
-            'nextSlotAt' => $this->sendLog->getNextSlotAt($accountId, $limit)?->toString(),
-            'daysLeft' => (int) ceil($pending / $limit),
-        ]);
+        ];
+
+        if ($accountId) {
+            $limit = max(1, (int) $entity->get('dailyLimit'));
+
+            $progress->limit = $limit;
+            $progress->usedInWindow = $this->sendLog->countInWindow($accountId);
+            $progress->nextSlotAt = $this->sendLog->getNextSlotAt($accountId, $limit)?->toString();
+            $progress->daysLeft = (int) ceil($pending / $limit);
+        }
+
+        $entity->set('sendingProgress', $progress);
     }
 
     private function countItems(MassEmail $massEmail, string $status): int

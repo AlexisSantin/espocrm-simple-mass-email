@@ -6,8 +6,13 @@
  ************************************************************************/
 
 import MassEmailEditView from 'crm:views/mass-email/record/edit';
-import Ajax from 'ajax';
 import Ui from 'ui';
+import {
+    getSendingState,
+    getSendNowMessage,
+    getSentMessage,
+    askSendingDate,
+} from 'simple-mass-email:views/mass-email/helpers/sending';
 
 const DEFAULT_DAILY_LIMIT = 45;
 
@@ -87,6 +92,11 @@ class SimpleMassEmailEditView extends MassEmailEditView {
                         <div class="simple-mass-email-row">
                             <label class="control-label">{{translate 'campaign' category='fields' scope='MassEmail'}}</label>
                             <div class="field" data-name="campaign"></div>
+                            {{#if campaignRequired}}
+                            <p class="text-muted small simple-mass-email-hint">
+                                {{translate 'campaignRequiredHint' category='labels' scope='SimpleMassEmail'}}
+                            </p>
+                            {{/if}}
                         </div>
                         <div class="simple-mass-email-row">
                             <label class="control-label">{{translate 'targetLists' category='fields' scope='MassEmail'}}</label>
@@ -95,10 +105,6 @@ class SimpleMassEmailEditView extends MassEmailEditView {
                         <div class="simple-mass-email-row">
                             <label class="control-label">{{translate 'excludingTargetLists' category='fields' scope='MassEmail'}}</label>
                             <div class="field" data-name="excludingTargetLists"></div>
-                        </div>
-                        <div class="simple-mass-email-row">
-                            <label class="control-label">{{translate 'startAt' category='fields' scope='MassEmail'}}</label>
-                            <div class="field" data-name="startAt"></div>
                         </div>
                         <div class="simple-mass-email-row">
                             <label class="control-label">{{translate 'storeSentEmails' category='fields' scope='MassEmail'}}</label>
@@ -112,20 +118,10 @@ class SimpleMassEmailEditView extends MassEmailEditView {
 
                     <div class="simple-mass-email-block">
                         <h4 class="simple-mass-email-block-title">{{translate 'Test email' category='labels' scope='SimpleMassEmail'}}</h4>
-                        {{#if testAddress}}
-                        <p class="text-muted">
-                            {{translate 'Test email will be sent to' category='labels' scope='SimpleMassEmail'}}
-                            <strong>{{testAddress}}</strong>
-                        </p>
+                        <p class="text-muted">{{translate 'testHint' category='labels' scope='SimpleMassEmail'}}</p>
                         <button class="btn btn-default btn-block" data-action="sendTest">
                             {{translate 'Send test email' category='labels' scope='SimpleMassEmail'}}
                         </button>
-                        {{else}}
-                        <p class="text-muted">{{translate 'noTestAddressHint' category='labels' scope='SimpleMassEmail'}}</p>
-                        <a class="btn btn-default btn-block" href="#User/view/{{userId}}">
-                            {{translate 'Open my profile' category='labels' scope='SimpleMassEmail'}}
-                        </a>
-                        {{/if}}
                     </div>
 
                     <div class="simple-mass-email-block">
@@ -153,24 +149,34 @@ class SimpleMassEmailEditView extends MassEmailEditView {
     stickButtonsFormBottomSelector = '.simple-mass-email-grid';
     stickButtonsContainerAllTheWay = true;
 
-    buttonList = [
-        {
-            name: 'sendEmail',
-            label: 'Send email',
-            style: 'primary',
-        },
-        {
-            name: 'save',
-            label: 'Save',
-        },
-        {
-            name: 'cancel',
-            label: 'Cancel',
-        },
-    ];
-
     setup() {
         this.detailLayout = [];
+
+        // Sending is chosen with a button, not by editing the status and the start date.
+        this.buttonList = [
+            {
+                name: 'sendNow',
+                text: this.translate('Send now', 'labels', 'SimpleMassEmail'),
+                style: 'primary',
+            },
+            {
+                name: 'schedule',
+                text: this.translate('Schedule…', 'labels', 'SimpleMassEmail'),
+            },
+            {
+                name: 'save',
+                label: 'Save',
+            },
+            {
+                name: 'cancel',
+                label: 'Cancel',
+            },
+        ];
+
+        if (!['new', 'draft', 'failed', 'scheduled'].includes(getSendingState(this, this.model))) {
+            // Being sent or finished: nothing more to send from here.
+            this.buttonList = this.buttonList.filter(item => !['sendNow', 'schedule'].includes(item.name));
+        }
 
         super.setup();
 
@@ -178,7 +184,7 @@ class SimpleMassEmailEditView extends MassEmailEditView {
         this.templateSnapshot = null;
         this.ownTemplateId = null;
         this.linkedTemplate = null;
-        this.isSendRequested = false;
+        this.sendRequest = null;
 
         if (this.model.isNew()) {
             // The native default status is "Pending", which would queue the email for sending on save.
@@ -189,12 +195,18 @@ class SimpleMassEmailEditView extends MassEmailEditView {
 
         this.createField('name', null, {required: true});
 
+        // Shown only: it changes with the sending buttons.
+        this.createField('status', null, null, 'detail', true);
+
+        // Without a campaign, a mass email belongs to nobody: a role that edits only its own
+        // campaigns, or its team's, can then neither create nor change it.
+        this.createField('campaign', 'simple-mass-email:views/mass-email/fields/campaign', {
+            required: this.isCampaignRequired(),
+        });
+
         this.fieldNameList = [
-            'status',
-            'campaign',
             'targetLists',
             'excludingTargetLists',
-            'startAt',
             'storeSentEmails',
             'optOutEntirely',
             'smtpAccount',
@@ -222,7 +234,7 @@ class SimpleMassEmailEditView extends MassEmailEditView {
 
         this.createEmailTemplateField();
 
-        this.ownFieldNameList = ['name', 'emailTemplate', ...this.fieldNameList];
+        this.ownFieldNameList = ['name', 'status', 'campaign', 'emailTemplate', ...this.fieldNameList];
 
         this.wait(this.loadTemplate());
     }
@@ -272,6 +284,10 @@ class SimpleMassEmailEditView extends MassEmailEditView {
         return !!this.model.get('emailAccountId');
     }
 
+    isCampaignRequired() {
+        return !this.getUser().isAdmin() && this.getAcl().getLevel('Campaign', 'edit') !== 'all';
+    }
+
     updateDailyLimitRow() {
         const isPersonal = this.isPersonal();
 
@@ -313,8 +329,7 @@ class SimpleMassEmailEditView extends MassEmailEditView {
     data() {
         const data = super.data();
 
-        data.testAddress = this.getUser().get('emailAddress') || '';
-        data.userId = this.getUser().id;
+        data.campaignRequired = this.isCampaignRequired();
 
         return data;
     }
@@ -468,8 +483,13 @@ class SimpleMassEmailEditView extends MassEmailEditView {
             data.emailTemplateName = this.linkedTemplate.name;
         }
 
-        if (this.isSendRequested) {
+        // The status is changed only by the sending buttons.
+        delete data.status;
+
+        if (this.sendRequest) {
+            // Pending is handed to the extension's job; an empty date means now.
             data.status = 'Pending';
+            data.startAt = this.sendRequest.startAt;
         }
 
         return data;
@@ -567,36 +587,50 @@ class SimpleMassEmailEditView extends MassEmailEditView {
         return keys.some(key => attributes[key] !== snapshot[key]);
     }
 
-    actionSendEmail() {
-        const message = this.isPersonal() ?
-            this.translate('confirmSendPersonal', 'messages', 'SimpleMassEmail')
-                .replace('{limit}', this.getView('dailyLimitField').fetch().dailyLimit) :
-            this.translate('confirmSend', 'messages', 'SimpleMassEmail');
+    actionSendNow() {
+        const limit = this.isPersonal() ? this.getView('dailyLimitField').fetch().dailyLimit : null;
 
-        Ui.confirm(message, {
-            confirmText: this.translate('Send email', 'labels', 'MassEmail'),
+        Ui.confirm(getSendNowMessage(this, limit), {
+            confirmText: this.translate('Send now', 'labels', 'SimpleMassEmail'),
             cancelText: this.translate('Cancel', 'labels'),
             confirmStyle: 'primary',
-        }).then(() => this.sendEmail());
+        }).then(() => this.send(null));
     }
 
-    async sendEmail() {
-        this.isSendRequested = true;
+    async actionSchedule() {
+        const startAt = await askSendingDate(this, this.model.get('startAt'));
+
+        if (startAt) {
+            await this.send(startAt);
+        }
+    }
+
+    /**
+     * @param {?string} startAt A date, or null for now.
+     */
+    async send(startAt) {
+        const isNew = this.model.isNew();
+
+        this.sendRequest = {startAt: startAt};
 
         try {
             await this.save();
         }
         catch (reason) {
-            this.isSendRequested = false;
-
             return;
         }
+        finally {
+            this.sendRequest = null;
+        }
 
-        this.isSendRequested = false;
+        Ui.success(getSentMessage(this, startAt));
 
-        this.exit(this.model.isNew() ? 'create' : 'save');
+        this.exit(isNew ? 'create' : 'save');
     }
 
+    /**
+     * The native test: the recipients are chosen among users, contacts, leads and accounts.
+     */
     async actionSendTest() {
         try {
             await this.save();
@@ -607,35 +641,11 @@ class SimpleMassEmailEditView extends MassEmailEditView {
             }
         }
 
-        const user = this.getUser();
-        const address = user.get('emailAddress');
+        const view = await this.createView('sendTestModal', 'crm:views/mass-email/modals/send-test', {
+            model: this.model,
+        });
 
-        if (!address) {
-            Ui.error(this.translate('noTestAddress', 'messages', 'SimpleMassEmail'));
-
-            return;
-        }
-
-        try {
-            await Ajax.postRequest('MassEmail/action/sendTest', {
-                id: this.model.id,
-                targetList: [{id: user.id, type: 'User'}],
-            });
-
-            Ui.success(this.translate('testEmailSent', 'messages', 'SimpleMassEmail') + ' ' + address);
-        }
-        catch (e) {
-            // A precise reason from the server is displayed by the application.
-            if (e?.responseText?.includes('messageTranslation')) {
-                return;
-            }
-
-            if (e) {
-                e.errorIsHandled = true;
-            }
-
-            Ui.error(this.translate('testEmailError', 'messages', 'SimpleMassEmail'));
-        }
+        await view.render();
     }
 }
 

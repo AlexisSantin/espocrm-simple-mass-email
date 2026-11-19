@@ -18,13 +18,16 @@ use Espo\ORM\EntityManager;
 use Throwable;
 
 /**
- * Sends the mass emails of personal accounts, within the limit of each account.
+ * Sends the mass emails handed to the extension, once their date has come:
+ * - Sending: through the system or a group account, like the native job;
+ * - Throttled: through a personal account, within the limit of the account.
  *
- * Their status keeps them out of the native job, which would send everything at once.
+ * Their status keeps them out of the native job, so that both never send the same mass email.
  */
 class Runner
 {
     public const STATUS_THROTTLED = 'Throttled';
+    public const STATUS_SENDING = 'Sending';
 
     private const DEFAULT_MAX_ATTEMPT_COUNT = 3;
 
@@ -34,6 +37,7 @@ class Runner
         private SendLog $sendLog,
         private ProcessorFactory $processorFactory,
         private QueueCreator $queueCreator,
+        private SendingProcessor $sendingProcessor,
         private Metadata $metadata,
         private Config $config,
         private Language $defaultLanguage,
@@ -47,7 +51,7 @@ class Runner
         $massEmails = $this->entityManager
             ->getRDBRepositoryByClass(MassEmail::class)
             ->where([
-                'status' => self::STATUS_THROTTLED,
+                'status' => [self::STATUS_SENDING, self::STATUS_THROTTLED],
                 'startAt<=' => DateTime::createNow()->toString(),
             ])
             ->order('startAt')
@@ -66,6 +70,24 @@ class Runner
     }
 
     private function process(MassEmail $massEmail): void
+    {
+        if ($massEmail->getStatus() === self::STATUS_THROTTLED) {
+            $this->processPersonal($massEmail);
+
+            return;
+        }
+
+        if (!$this->hasQueue($massEmail) && !$this->createQueue($massEmail)) {
+            return;
+        }
+
+        $this->failOptedOutItems($massEmail);
+
+        // The native processor: system or group SMTP, hourly limit, completion.
+        $this->sendingProcessor->process($massEmail);
+    }
+
+    private function processPersonal(MassEmail $massEmail): void
     {
         $account = $this->accounts->findUsable((string) $massEmail->get('emailAccountId'));
         $smtpParams = $account ? $this->accounts->getSmtpParams($account) : null;
@@ -163,19 +185,19 @@ class Runner
     private function createQueue(MassEmail $massEmail): bool
     {
         // The native queue creator only accepts this status. It is not stored: the save at the
-        // end of the creation goes through the hook, which restores the throttled status.
+        // end of the creation goes through the hook, which restores the extension's status.
         $massEmail->setStatus(MassEmail::STATUS_PENDING);
 
         $this->queueCreator->create($massEmail);
 
         if ($massEmail->getStatus() === MassEmail::STATUS_PENDING) {
             // Skipped by the native code: the campaign is inactive.
-            $massEmail->setStatus(self::STATUS_THROTTLED);
+            $massEmail->setStatus($massEmail->get('emailAccountId') ? self::STATUS_THROTTLED : self::STATUS_SENDING);
 
             return false;
         }
 
-        return $massEmail->getStatus() === self::STATUS_THROTTLED;
+        return in_array($massEmail->getStatus(), [self::STATUS_SENDING, self::STATUS_THROTTLED], true);
     }
 
     /**

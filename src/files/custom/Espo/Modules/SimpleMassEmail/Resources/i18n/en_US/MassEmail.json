@@ -1,7 +1,4 @@
 {
-    "labels": {
-        "Send email": "Send email"
-    },
     "fields": {
         "emailAccount": "Personal email account",
         "dailyLimit": "Sending limit per 24 hours",
@@ -9,7 +6,8 @@
     },
     "options": {
         "status": {
-            "Throttled": "Sending in batches"
+            "Throttled": "Sending in batches",
+            "Sending": "Sending"
         }
     },
     "tooltips": {
