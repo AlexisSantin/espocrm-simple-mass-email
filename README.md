@@ -39,7 +39,7 @@ Extension EspoCRM qui permet de rédiger et d'envoyer un email de masse directem
 
 - Un SMTP système doit être configuré dans EspoCRM (Administration → Outbound Emails), sauf pour un envoi par compte personnel. Sans SMTP, l'envoi échoue et l'erreur n'est visible que dans les journaux (`data/logs/espo-*.log`).
 - Pour un compte personnel : le compte doit être actif, avec son SMTP configuré, et le rôle de l'utilisateur doit autoriser les comptes email personnels.
-- La sauvegarde crée ou met à jour un EmailTemplate : les rôles non administrateurs doivent donc aussi avoir les droits sur les EmailTemplate. Ce point n'a pas encore été testé avec un rôle restreint.
+- La sauvegarde crée ou met à jour un EmailTemplate, assigné à son auteur : les rôles non administrateurs doivent pouvoir créer des EmailTemplate et lire et modifier les leurs. Testé avec un rôle limité à ses propres modèles et un droit d'assignation « tous » ou « équipe ».
 - L'envoi effectif est assuré par le cron `ProcessMassEmail`, ou `SimpleMassEmailSendPersonal` pour un compte personnel.
 
 ## Limites

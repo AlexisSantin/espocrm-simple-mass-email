@@ -9,6 +9,7 @@ use Espo\Core\Api\Request;
 use Espo\Core\Api\Response;
 use Espo\Core\Api\ResponseComposer;
 use Espo\Core\Exceptions\BadRequest;
+use Espo\Core\Exceptions\Error\Body;
 use Espo\Core\Exceptions\Forbidden;
 use Espo\Core\Exceptions\NotFound;
 use Espo\Entities\User;
@@ -56,7 +57,10 @@ class PostSendTest implements Action
         }
 
         if (!$this->accounts->isOwnedBy($accountId, $this->user)) {
-            throw new Forbidden("Only the owner of the email account can send from it.");
+            throw Forbidden::createWithBody(
+                'Only the owner of the email account can send from it.',
+                Body::create()->withMessageTranslation('notAccountOwner', 'SimpleMassEmail')
+            );
         }
 
         $this->testSender->send($massEmail, $this->getTargets($targetDataList));

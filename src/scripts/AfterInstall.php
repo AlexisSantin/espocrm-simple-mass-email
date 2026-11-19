@@ -7,6 +7,9 @@ use Espo\Core\Utils\Config\ConfigWriter;
 use Espo\ORM\EntityManager;
 
 /**
+ * Gives the content templates created without an assigned user (before 1.2.1) to their author:
+ * roles that read only their own templates could not open nor link them.
+ *
  * Schedules the job that sends the mass emails of personal accounts (once, so that the schedule
  * chosen by the administrator is kept).
  *
@@ -27,7 +30,10 @@ class AfterInstall
 
     public function run(Container $container): void
     {
-        $this->scheduleJob($container->getByClass(EntityManager::class));
+        $entityManager = $container->getByClass(EntityManager::class);
+
+        $this->assignContentTemplates($entityManager);
+        $this->scheduleJob($entityManager);
 
         $config = $container->getByClass(Config::class);
 
@@ -45,6 +51,23 @@ class AfterInstall
 
         $configWriter->set(self::FLAG, true);
         $configWriter->save();
+    }
+
+    private function assignContentTemplates(EntityManager $entityManager): void
+    {
+        $templates = $entityManager
+            ->getRDBRepository('EmailTemplate')
+            ->where([
+                'oneOff' => true,
+                'assignedUserId' => null,
+                'createdById!=' => null,
+            ])
+            ->find();
+
+        foreach ($templates as $template) {
+            $template->set('assignedUserId', $template->get('createdById'));
+            $entityManager->saveEntity($template, ['skipHooks' => true, 'silent' => true]);
+        }
     }
 
     private function scheduleJob(EntityManager $entityManager): void

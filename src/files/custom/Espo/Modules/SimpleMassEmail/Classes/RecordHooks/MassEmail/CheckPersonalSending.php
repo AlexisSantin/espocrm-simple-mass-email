@@ -3,6 +3,7 @@
 namespace Espo\Modules\SimpleMassEmail\Classes\RecordHooks\MassEmail;
 
 use Espo\Core\Exceptions\BadRequest;
+use Espo\Core\Exceptions\Error\Body;
 use Espo\Core\Exceptions\Forbidden;
 use Espo\Core\Record\Hook\SaveHook;
 use Espo\Entities\User;
@@ -37,7 +38,10 @@ class CheckPersonalSending implements SaveHook
 
         if ($previousAccountId && !$this->accounts->isOwnedBy($previousAccountId, $this->user)) {
             if (!$this->isOnlyStopped($entity)) {
-                throw new Forbidden("Only the owner of the email account can change this mass email.");
+                throw Forbidden::createWithBody(
+                    'Only the owner of the email account can change this mass email.',
+                    Body::create()->withMessageTranslation('notAccountOwner', 'SimpleMassEmail')
+                );
             }
 
             return;

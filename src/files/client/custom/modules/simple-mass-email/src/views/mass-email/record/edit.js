@@ -112,6 +112,7 @@ class SimpleMassEmailEditView extends MassEmailEditView {
 
                     <div class="simple-mass-email-block">
                         <h4 class="simple-mass-email-block-title">{{translate 'Test email' category='labels' scope='SimpleMassEmail'}}</h4>
+                        {{#if testAddress}}
                         <p class="text-muted">
                             {{translate 'Test email will be sent to' category='labels' scope='SimpleMassEmail'}}
                             <strong>{{testAddress}}</strong>
@@ -119,6 +120,12 @@ class SimpleMassEmailEditView extends MassEmailEditView {
                         <button class="btn btn-default btn-block" data-action="sendTest">
                             {{translate 'Send test email' category='labels' scope='SimpleMassEmail'}}
                         </button>
+                        {{else}}
+                        <p class="text-muted">{{translate 'noTestAddressHint' category='labels' scope='SimpleMassEmail'}}</p>
+                        <a class="btn btn-default btn-block" href="#User/view/{{userId}}">
+                            {{translate 'Open my profile' category='labels' scope='SimpleMassEmail'}}
+                        </a>
+                        {{/if}}
                     </div>
 
                     <div class="simple-mass-email-block">
@@ -140,6 +147,11 @@ class SimpleMassEmailEditView extends MassEmailEditView {
     // The fields are declared by this view only: the native layout would duplicate them.
     sideDisabled = true;
     bottomDisabled = true;
+
+    // The native middle panel is hidden here: measured from it, the button bar would be hidden as
+    // soon as the page scrolls. It follows the form instead, down to its end.
+    stickButtonsFormBottomSelector = '.simple-mass-email-grid';
+    stickButtonsContainerAllTheWay = true;
 
     buttonList = [
         {
@@ -302,6 +314,7 @@ class SimpleMassEmailEditView extends MassEmailEditView {
         const data = super.data();
 
         data.testAddress = this.getUser().get('emailAddress') || '';
+        data.userId = this.getUser().id;
 
         return data;
     }
@@ -491,6 +504,21 @@ class SimpleMassEmailEditView extends MassEmailEditView {
             isHtml: true,
             oneOff: true,
         };
+
+        if (this.templateModel.isNew()) {
+            // Owned by its author: roles that read only their own templates, or assign only within
+            // their teams, would otherwise refuse to create it or to link it to the mass email.
+            templateAttributes.assignedUserId = this.getUser().id;
+            templateAttributes.assignedUserName = this.getUser().get('name');
+
+            // Like a record created in EspoCRM's own forms.
+            const defaultTeamId = this.getUser().get('defaultTeamId');
+
+            if (defaultTeamId) {
+                templateAttributes.teamsIds = [defaultTeamId];
+                templateAttributes.teamsNames = {[defaultTeamId]: this.getUser().get('defaultTeamName')};
+            }
+        }
 
         let templateSaved = false;
 

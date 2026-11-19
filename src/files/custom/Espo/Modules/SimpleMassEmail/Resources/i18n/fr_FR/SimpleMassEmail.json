@@ -11,7 +11,9 @@
         "progressCounts": "{sent} envoyés, {pending} en attente, {failed} non envoyés",
         "progressWindow": "{usedInWindow} sur {limit} utilisés sur les dernières 24 heures",
         "progressNext": "Prochain envoi possible : {date}",
-        "progressDays": "Environ {daysLeft} jour(s) restant(s)"
+        "progressDays": "Environ {daysLeft} jour(s) restant(s)",
+        "noTestAddressHint": "Votre utilisateur n'a pas d'adresse email. Ajoutez-en une à votre profil pour recevoir le test.",
+        "Open my profile": "Ouvrir mon profil"
     },
     "messages": {
         "confirmSend": "L'email sera envoyé aux cibles de cette campagne d'email. Continuer ?",
@@ -25,6 +27,7 @@
         "dailyLimitReached": "La limite de ce compte sur 24 heures est atteinte.",
         "sendingSuspendedAccount": "L'envoi de {link} est suspendu : le compte email personnel n'est plus utilisable. Corrigez le compte, puis renvoyez l'email groupé pour reprendre.",
         "sendingSuspendedSmtp": "L'envoi de {link} est suspendu : le serveur SMTP refuse les emails à répétition. Vérifiez le compte, puis renvoyez l'email groupé pour reprendre.",
-        "sendingSuspendedInformational": "L'envoi de {link} est suspendu : une campagne informative n'a pas de lien de désinscription et ne peut pas utiliser un compte email personnel."
+        "sendingSuspendedInformational": "L'envoi de {link} est suspendu : une campagne informative n'a pas de lien de désinscription et ne peut pas utiliser un compte email personnel.",
+        "notAccountOwner": "Seul le propriétaire de ce compte email personnel peut envoyer ou modifier cet email groupé."
     }
 }
