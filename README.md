@@ -66,3 +66,10 @@ Extension EspoCRM qui permet de rédiger un email de masse directement dans la v
 - L'entrée de barre latérale n'est ajoutée qu'à la liste d'onglets du système. Les utilisateurs qui ont leur propre liste (Préférences) peuvent l'ajouter eux-mêmes : onglet de type URL vers `#MassEmail/create`.
 - Le lien suit le droit de lecture sur les Campagnes. Un utilisateur qui peut lire les campagnes sans pouvoir les modifier voit donc le lien, mais EspoCRM refuse la création.
 - Les options absentes du Mass Email natif ne sont pas ajoutées : « une seule fois / ne pas renvoyer aux contacts déjà ciblés », catégorie, utilisateur assigné et équipes.
+
+## Licence
+
+Copyright (C) 2026 Alexis SANTIN.
+
+Simple Mass Email est un logiciel libre, publié sous la [GNU Affero General Public License v3.0 ou ultérieure](LICENSE),
+la même licence qu’EspoCRM.
