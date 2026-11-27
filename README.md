@@ -1,108 +1,110 @@
 # Simple Mass Email
 
-[![Licence : AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0-blue.svg)](LICENSE)
+[![License: AGPL v3](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
 ![EspoCRM 10.0.3+](https://img.shields.io/badge/EspoCRM-10.0.3%2B-5c7cfa.svg)
 ![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777bb4.svg)
 
-Extension EspoCRM pour rédiger, tester et envoyer un email groupé depuis un seul écran. Vous pouvez l'envoyer tout de suite ou le planifier, depuis le SMTP de l'entreprise ou depuis votre propre boîte mail avec une limite d'envoi par 24 heures.
+An EspoCRM extension to write, test and send a mass email from one screen. Send it now or schedule it, through the company's SMTP or from your own mailbox with a sending limit per 24 hours.
 
-![Formulaire d'un email groupé : compte personnel, limite d'envoi, objet et corps, boutons Envoyer maintenant et Planifier](docs/screenshots/fr/form.png)
+![Mass email form: personal account, sending limit, subject and body, Send now and Schedule buttons](docs/screenshots/en/form.png)
 
-## Ce que l'extension change
+## What it changes
 
-Dans EspoCRM, un email groupé (Mass Email) se prépare depuis une campagne : il faut créer un modèle d'email à part, puis régler un statut et une date de début, et attendre le passage du planificateur. L'envoi part alors aussi vite que le permet le plafond horaire réglé par l'administrateur, depuis le SMTP du système ou d'un compte de groupe : il n'y a pas de limite par jour ni d'envoi depuis votre propre boîte mail.
+In EspoCRM, a mass email is prepared from a campaign: you create an email template on the side, set a status and a start date, then wait for the scheduler. The emails then leave as fast as the hourly limit set by the administrator allows, through the system or a group email account: there is no daily limit and no sending from your own mailbox.
 
-Avec Simple Mass Email :
+With Simple Mass Email:
 
-- **Une entrée « Nouvel email groupé »** dans la barre latérale ouvre directement le formulaire.
-- **L'objet et le corps s'écrivent dans le formulaire**, sans passer par un modèle d'email. Vous pouvez aussi partir d'un modèle existant, qui n'est jamais modifié.
-- **Deux boutons pour envoyer** : « Envoyer maintenant », qui démarre dans la minute, ou « Planifier… », pour choisir la date et l'heure.
-- **L'envoi peut partir de votre boîte mail** (compte email personnel), avec une limite par 24 heures : sur 200 contacts avec une limite de 45, l'envoi s'étale sur 5 jours, tout seul.
-- **La fiche suit l'envoi** : envoyés, en attente, prochain envoi possible. Vous pouvez mettre en pause, reprendre ou annuler une planification.
+- **A "New Mass Email" entry** in the side menu opens the form directly.
+- **Subject and body are written in the form**, without a separate email template. You can also start from an existing template, which is never modified.
+- **Two buttons to send**: "Send now", which starts within a minute, or "Schedule…", to pick the date and time.
+- **Sending can leave from your own mailbox** (personal email account), with a limit per 24 hours: 200 contacts with a limit of 45 are sent over 5 days, on their own.
+- **The record follows the sending**: sent, waiting, next possible sending. You can pause, resume or cancel a schedule.
 
-## Fonctionnalités
+## Features
 
-### Envoyer maintenant ou planifier
+### Send now or schedule
 
-« Envoyer maintenant » lance l'envoi dans la minute. « Planifier… » ouvre une fenêtre qui demande la date et l'heure, par défaut le lendemain à 9 h. Le statut et la date de début ne se règlent plus à la main.
+"Send now" starts the sending within a minute. "Schedule…" opens a window asking for the date and time, tomorrow at 9:00 by default. The status and the start date are no longer edited by hand.
 
-![Fenêtre « Planifier l'envoi » avec la date et l'heure](docs/screenshots/fr/schedule-window.png)
+![The "Schedule the sending" window with its date and time](docs/screenshots/en/schedule-window.png)
 
-La fiche affiche l'état de l'email groupé et les actions possibles :
+The record shows the state of the mass email and the available actions:
 
-| État | Statut affiché | Boutons |
+| State | Status shown | Buttons |
 | --- | --- | --- |
-| Brouillon | Brouillon | Envoyer maintenant, Planifier… |
-| Planifié | Planifié · date | Envoyer maintenant, Planifier…, Annuler la planification |
-| En cours | Envoi en cours, ou Envoi échelonné pour un compte personnel | Mettre en pause |
-| Suspendu | Échec | Reprendre l'envoi |
+| Draft | Draft | Send now, Schedule… |
+| Scheduled | Scheduled · date | Send now, Schedule…, Cancel schedule |
+| Running | Sending, or Sending in batches for a personal account | Pause |
+| Suspended | Failed | Resume sending |
 
-![Email groupé planifié pour le lendemain à 9 h](docs/screenshots/fr/scheduled.png)
+![A mass email scheduled for tomorrow at 9:00](docs/screenshots/en/scheduled.png)
 
-Mettre en pause ou annuler une planification repasse l'email en brouillon. Un nouvel envoi reprend avec les destinataires restants, sans écrire deux fois à la même personne.
+Pausing or cancelling a schedule puts the mass email back to draft. Sending it again resumes with the remaining recipients, without writing twice to the same person.
 
-### Envoi depuis votre boîte mail, avec une limite
+### Sending from your own mailbox, with a limit
 
-Le champ « Compte SMTP » propose, en plus du SMTP du système et des comptes de groupe, vos comptes email personnels (ceux dont le SMTP est configuré). Choisissez-en un, puis indiquez la limite d'envoi sur 24 heures (45 par défaut) :
+Besides the system SMTP and the group accounts, the "SMTP Account" field lists your personal email accounts (those with an SMTP server set up). Pick one, then set the sending limit per 24 hours (45 by default):
 
-- l'email part de votre adresse ;
-- la limite s'applique **à votre compte**, tous emails groupés et tests confondus, sur 24 heures glissantes, quelle que soit la façon dont votre fournisseur compte ses journées ;
-- les emails restants partent automatiquement les jours suivants ;
-- un contact qui se désinscrit pendant l'envoi ne reçoit pas les emails prévus les jours suivants.
+- the email leaves from your address;
+- the limit applies **to your account**, across all mass emails and tests, over any 24 hours, whatever way your provider counts a day;
+- the remaining emails leave automatically on the following days;
+- a contact who unsubscribes during the sending does not get the emails planned for the following days.
 
-![Envoi échelonné : 45 envoyés, 155 en attente, prochain envoi possible le lendemain](docs/screenshots/fr/progress.png)
+![Sending in batches: 45 sent, 155 waiting, next sending possible tomorrow](docs/screenshots/en/progress.png)
 
-Si votre serveur SMTP refuse les emails à répétition, ou si le compte n'est plus utilisable, l'envoi est suspendu et vous recevez une notification. « Reprendre l'envoi » repart avec les contacts restants.
+If your SMTP server keeps refusing the emails, or the account can no longer be used, the sending is suspended and you get a notification. "Resume sending" goes on with the remaining contacts.
 
-Seul le propriétaire du compte peut l'utiliser ou modifier l'email groupé qui s'en sert, administrateurs compris. Les autres personnes autorisées à modifier l'email groupé peuvent seulement l'arrêter.
+Only the owner of the account can use it or change the mass email that uses it, administrators included. Other people allowed to edit the mass email can only stop it.
 
-### Email de test
+### Test email
 
-« Envoyer un test » ouvre la fenêtre de test d'EspoCRM : vous choisissez les destinataires parmi les utilisateurs, contacts, prospects et comptes. Avec un compte personnel, le test part de ce compte et compte dans sa limite.
+"Send test email" opens EspoCRM's test window: you choose the recipients among users, contacts, leads and accounts. With a personal account, the test leaves from that account and counts towards its limit.
 
-### Lien de désinscription
+### Unsubscribe link
 
-Comme dans EspoCRM, un lien de désinscription est ajouté en bas de l'email si le corps n'en contient pas (`{optOutLink}`), sauf si l'administrateur a désactivé ce lien obligatoire ou pour une campagne de type « informatif ». Avec un compte personnel, le lien est toujours ajouté, et les campagnes de type « informatif » sont refusées.
+As in EspoCRM, an unsubscribe link is added at the bottom of the email when the body has none (`{optOutLink}`), unless the administrator turned this mandatory link off or the campaign is of the "Informational Email" type. With a personal account, the link is always added, and informational campaigns are refused.
 
-### Campagne
+### Campaign
 
-Une campagne n'est pas nécessaire. Un rôle qui ne peut modifier que ses propres campagnes doit cependant en choisir une (sans campagne, EspoCRM refuse la création à ce rôle). Le formulaire l'indique et ne propose que ses campagnes.
+A campaign is not required. A role that can only edit its own campaigns must however pick one (without a campaign, EspoCRM refuses the creation to such a role). The form says so and only offers that user's campaigns.
 
 ## Installation
 
-1. Téléchargez `simple-mass-email-x.y.z.zip` depuis la [dernière version](https://github.com/AlexisSantin/espocrm-simple-mass-email/releases/latest).
-2. Dans EspoCRM : Administration → Extensions → choisir le fichier → Installer.
+1. Download `simple-mass-email-x.y.z.zip` from the [latest release](https://github.com/AlexisSantin/espocrm-simple-mass-email/releases/latest).
+2. In EspoCRM: Administration → Extensions → choose the file → Install.
 
-L'installation ajoute « Nouvel email groupé » dans la barre latérale, juste après « Emails », et planifie la tâche d'envoi chaque minute. Pour mettre à jour, installez la nouvelle version par-dessus la précédente.
+The installation adds "New Mass Email" to the side menu, right after "Emails", and schedules the sending job every minute. To update, install the new version over the previous one.
 
-## Prérequis
+## Requirements
 
-- EspoCRM 10.0.3 ou plus récent (testé sur 10.0.11 et 10.1.1), PHP 8.3 ou plus récent.
-- Le cron d'EspoCRM doit tourner chaque minute, comme EspoCRM le recommande : c'est lui qui lance les envois.
-- Envoi par le système : une adresse d'envoi configurée dans Administration → Emails sortants, avec son compte SMTP.
-- Envoi par un compte personnel : un compte email personnel actif, avec son SMTP configuré, et un rôle qui autorise les comptes personnels.
-- Les utilisateurs non administrateurs doivent pouvoir créer des modèles d'email et lire et modifier les leurs : l'objet et le corps y sont enregistrés.
+- EspoCRM 10.0.3 or later (tested on 10.0.11 and 10.1.1), PHP 8.3 or later.
+- EspoCRM's cron must run every minute, as EspoCRM recommends: it starts the sendings.
+- Sending through the system: an outbound address set up in Administration → Outbound Emails, with its SMTP account.
+- Sending through a personal account: an active personal email account with its SMTP set up, and a role that allows personal email accounts.
+- Non-admin users must be able to create email templates and to read and edit their own: the subject and body are stored in one.
 
-## Bon à savoir
+The interface is available in English and French.
 
-- Avec un compte personnel, les emails d'un lot partent à la suite, lors d'un même passage du cron. Ils n'apparaissent pas dans le dossier « Envoyés » de votre boîte mail. Vos emails écrits à côté ne sont pas décomptés : gardez une marge sous la limite de votre fournisseur.
-- La liste des destinataires est figée au premier envoi : les contacts ajoutés ensuite aux listes de diffusion ne sont pas inclus.
-- Si vous désinstallez l'extension pendant un envoi, cet envoi reste en suspens : les emails groupés en cours ou planifiés ne partent plus.
-- L'entrée de la barre latérale est ajoutée à la liste d'onglets du système. Les utilisateurs qui ont leur propre liste (Préférences) peuvent l'ajouter eux-mêmes : onglet de type URL vers `#MassEmail/create`.
-- Le lien de la barre latérale suit le droit de lecture sur les campagnes : un utilisateur qui peut les lire sans pouvoir les modifier voit le lien, mais EspoCRM refuse la création.
+## Good to know
 
-## Fonctionnement technique
+- With a personal account, the emails of a batch leave one after the other, during one run of the cron. They do not appear in the "Sent" folder of your mailbox. Emails you write besides are not counted: keep a margin below your provider's limit.
+- The recipient list is set when the sending starts: contacts added to the target lists afterwards are not included.
+- If you uninstall the extension during a sending, that sending stays on hold: mass emails being sent or scheduled no longer leave.
+- The side menu entry is added to the system tab list. Users with their own tab list (Preferences) can add it themselves: a URL tab to `#MassEmail/create`.
+- The side menu link follows the read access to campaigns: a user who can read campaigns but not edit them sees the link, but EspoCRM refuses the creation.
 
-- Le module `SimpleMassEmail` remplace les vues natives de l'email groupé (`metadata/clientDefs/MassEmail.json`) : `recordViews.edit` pour le formulaire en deux colonnes, `recordViews.detail` pour la fiche et ses boutons d'envoi.
-- L'objet et le corps sont enregistrés dans un modèle d'email interne, marqué `oneOff`, assigné à son auteur avec son équipe par défaut et lié par `emailTemplateId`. Un modèle partagé n'est jamais modifié : s'il est changé dans le formulaire, une copie privée est créée.
-- Envoyer ou planifier enregistre le statut `Pending`, avec la date choisie, ou une date vide pour « maintenant ». À chaque sauvegarde, API comprise, le hook `SendingStatus` le remplace par `Sending` (« Envoi en cours », SMTP système ou de groupe) ou `Throttled` (« Envoi échelonné », compte personnel), et une date vide devient l'heure de la sauvegarde.
-- Ces deux statuts tiennent l'email groupé à l'écart de la tâche native `ProcessMassEmail`. La tâche `SimpleMassEmailSendPersonal`, planifiée chaque minute, les envoie à leur date avec le `SendingProcessor` d'EspoCRM : lien et en-têtes de désinscription, suivi de campagne, limite horaire `massEmailMaxPerHourCount`. Les deux tâches n'envoient donc jamais le même email groupé, et une désinstallation ne peut pas déclencher un envoi massif d'un coup.
-- Pour un compte personnel, le `SendingProcessor` reçoit le SMTP du compte et envoie un email à la fois, après vérification de la limite. Les envois sont notés dans l'entité interne `SimpleMassEmailSend`, qui survit à la suppression d'un email groupé. Le lien de désinscription est imposé (`massEmailDisableMandatoryOptOutLink` ignoré).
-- Le module est livré en bundle : `lib/init.js` est déclaré dans `metadata/app/client.json` (`scriptList`).
-- `scripts/AfterInstall.php` ajoute l'entrée de la barre latérale (lien `#MassEmail/create`, `aclScope` = `MassEmail`) après « Emails », planifie la tâche d'envoi et assigne à leur auteur les modèles internes créés sans utilisateur assigné. Le paramètre `simpleMassEmailTabAdded` évite de remettre un lien que l'administrateur a retiré. `scripts/AfterUninstall.php` retire le lien et la tâche.
+## How it works
 
-## Licence
+- The `SimpleMassEmail` module replaces the native mass email views (`metadata/clientDefs/MassEmail.json`): `recordViews.edit` for the two-column form, `recordViews.detail` for the record and its sending buttons.
+- The subject and body are stored in an internal email template, flagged `oneOff`, assigned to its author with their default team and linked through `emailTemplateId`. A shared template is never modified: if it is changed in the form, a private copy is created.
+- Sending or scheduling saves the `Pending` status, with the chosen date, or an empty date for "now". On every save, API included, the `SendingStatus` hook replaces it with `Sending` (system or group SMTP) or `Throttled` ("Sending in batches", personal account), and an empty date becomes the time of the save.
+- These two statuses keep the mass email away from the native `ProcessMassEmail` job. The `SimpleMassEmailSendPersonal` job, scheduled every minute, sends them at their date with EspoCRM's `SendingProcessor`: unsubscribe link and headers, campaign tracking, hourly limit `massEmailMaxPerHourCount`. Both jobs therefore never send the same mass email, and an uninstall cannot trigger a mass sending all at once.
+- For a personal account, the `SendingProcessor` gets the account's SMTP and sends one email at a time, after checking the limit. The sendings are recorded in the internal `SimpleMassEmailSend` entity, which outlives a deleted mass email. The unsubscribe link is enforced (`massEmailDisableMandatoryOptOutLink` is ignored).
+- The module is bundled: `lib/init.js` is declared in `metadata/app/client.json` (`scriptList`).
+- `scripts/AfterInstall.php` adds the side menu entry (link `#MassEmail/create`, `aclScope` = `MassEmail`) after "Emails", schedules the sending job and assigns to their author the internal templates created without an assigned user. The `simpleMassEmailTabAdded` setting avoids bringing back a link the administrator removed. `scripts/AfterUninstall.php` removes the link and the job.
+
+## License
 
 Copyright (C) 2026 Alexis SANTIN.
 
-Simple Mass Email est un logiciel libre, publié sous la [GNU Affero General Public License v3.0 ou ultérieure](LICENSE), la même licence qu'EspoCRM.
+Simple Mass Email is free software, released under the [GNU Affero General Public License v3.0 or later](LICENSE), the same license as EspoCRM.
