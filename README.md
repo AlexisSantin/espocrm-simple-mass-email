@@ -10,7 +10,7 @@ Extension EspoCRM pour rédiger, tester et envoyer un email groupé depuis un se
 
 ## Ce que l'extension change
 
-Dans EspoCRM, un email groupé (Mass Email) se prépare depuis une campagne : il faut créer un modèle d'email à part, puis régler un statut et une date de début, et attendre le passage du planificateur. L'envoi part en une fois, depuis le SMTP du système ou d'un compte de groupe.
+Dans EspoCRM, un email groupé (Mass Email) se prépare depuis une campagne : il faut créer un modèle d'email à part, puis régler un statut et une date de début, et attendre le passage du planificateur. L'envoi part alors aussi vite que le permet le plafond horaire réglé par l'administrateur, depuis le SMTP du système ou d'un compte de groupe : il n'y a pas de limite par jour ni d'envoi depuis votre propre boîte mail.
 
 Avec Simple Mass Email :
 
